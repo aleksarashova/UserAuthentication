@@ -1,0 +1,32 @@
+version: '3'
+services:
+  messaging-service:
+    build: .
+    ports:
+      - "5000:80"
+    depends_on:
+      - rabbitmq
+      - db
+    links:
+      - rabbitmq
+      - db
+
+  rabbitmq:
+    image: rabbitmq:3.13-rc
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+
+  db:
+    image: postgres:16
+    ports:
+      - "6543:5432"
+    environment:
+      - POSTGRES_DB=messaging_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql  # Mount the SQL script as an initialization script
